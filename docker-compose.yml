@@ -1,0 +1,34 @@
+version: "3"
+
+services:
+  # Service central et unique d'authentification  
+  sso-server:
+    # image: node:18
+    build: server
+    environment:
+      VIRTUAL_HOST: sso-server.test
+      VIRTUAL_PORT: 4444
+    volumes:
+      - ./server/:/home/node/app
+
+  # Quelques services (sites web) "clients" du SSO
+#   sso-client1:
+#     build: .
+
+  adminer:
+    image: adminer:4.8.1
+    environment:
+      VIRTUAL_HOST: adminer.test
+
+  whoami:
+    image: jwilder/whoami
+    environment:
+      VIRTUAL_HOST: whoami.test
+
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    ports:
+      - "80:80"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./vhost.d:/etc/nginx/vhost.d
